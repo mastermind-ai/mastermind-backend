@@ -2,6 +2,8 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from geneticAlgo.solve import start
 from qlearningsolve import qlearning_start
+from dqnsolve import dqn_start
+
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -55,6 +57,18 @@ def q_learning():
     answer_num += str(COLORS_INDEX.get(color))
   print(answer_num)
   board, state = qlearning_start(answer_num)
+  print(board)
+  print(state)
+  return {'board': board, 'state': state }
+
+@app.route('/dqn', methods=['POST'])
+@cross_origin()
+def dqn():
+  request_data = request.get_json()
+  numColors, target = request_data['numColors'], request_data['target']
+  print(numColors)
+  print(target)
+  board, state = dqn_start(target)
   print(board)
   print(state)
   return {'board': board, 'state': state }
