@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from geneticAlgo.solve import start
+from qlearningsolve import qlearning_start
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -31,7 +32,7 @@ def hello_world():
 
 @app.route('/genetic-algo', methods=['POST'])
 @cross_origin()
-def json_example():
+def genetic_algo():
   request_data = request.get_json()
   numColors, target = request_data['numColors'], request_data['target']
   print(numColors)
@@ -39,6 +40,23 @@ def json_example():
   answer_num = [COLORS_INDEX.get(color) for color in target]
   board, state = start(answer_num, False, numColors)
   print(board)
+  print(state)
+  return {'board': board, 'state': state }
+
+@app.route('/q-learning', methods=['POST'])
+@cross_origin()
+def q_learning():
+  request_data = request.get_json()
+  numColors, target = request_data['numColors'], request_data['target']
+  print(numColors)
+  print(target)
+  answer_num = ''
+  for color in target:
+    answer_num += str(COLORS_INDEX.get(color))
+  print(answer_num)
+  board, state = qlearning_start(answer_num)
+  print(board)
+  print(state)
   return {'board': board, 'state': state }
 
 if __name__ == '__main__':
