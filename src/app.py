@@ -1,13 +1,10 @@
-from flask import Flask
-from flask_restx import Resource, Api, reqparse
+from flask import Flask, request
+from flask_cors import CORS, cross_origin
 from geneticAlgo.solve import start
 
 app = Flask(__name__)
-api = Api(app)
-
-parser = reqparse.RequestParser()
-parser.add_argument('numColors', type=int, help='numer of colors in the pool')
-parser.add_argument('target', type=str, action='split', help='target')
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 INDEX_COLORS = {
   0: "red",
@@ -27,20 +24,22 @@ COLORS_INDEX = {
   "orange": 5,
 }
 
-@api.route('/hello')
-class HelloWorld(Resource):
-  def get(self):
-    return {'hello': 'world'}
+@app.route("/")
+@cross_origin()
+def hello_world():
+  return "<p>Hello, World!</p>"
 
-@api.route('/genetic-algo')
-class Ga(Resource):
-  @api.expect(parser)
-  def post(self):
-    args = parser.parse_args()
-    numColors, target = args['numColors'], args['target']
-    answer_num = [COLORS_INDEX.get(color) for color in target]
-    board, state = start(answer_num, False, numColors)
-    return {'board': board, 'state': state}
+@app.route('/genetic-algo', methods=['POST'])
+@cross_origin()
+def json_example():
+  request_data = request.get_json()
+  numColors, target = request_data['numColors'], request_data['target']
+  print(numColors)
+  print(target)
+  answer_num = [COLORS_INDEX.get(color) for color in target]
+  board, state = start(answer_num, False, numColors)
+  print(board)
+  return {'board': board, 'state': state }
 
 if __name__ == '__main__':
   app.run(debug=True)
